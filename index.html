@@ -37,6 +37,10 @@
     <script>
         const NWS_API_URL = 'https://weather.gov';
 
+        document.addEventListener('DOMContentLoaded', () => {
+            getWeather();
+        });
+
         function updateUI(period) {
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('weather-card').classList.remove('hidden');
@@ -74,9 +78,6 @@
                 }
             }
         }
-
-        getWeather();
     </script>
 </body>
 </html>
-

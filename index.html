@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sanford, FL Weather</title>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-    <script src="https://jsdelivr.net"></script>
+    <!-- Tailwind v3 script for reliable, runtime browser compilation -->
+    <script src="https://tailwindcss.com"></script>
 </head>
 <body class="bg-slate-100 flex items-center justify-center min-h-screen text-slate-800 p-4">
 
@@ -28,64 +29,72 @@
             <hr class="border-slate-100 my-6">
             
             <div class="text-left bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Coming up</p>
-                <p id="detailed-forecast" class="text-sm text-slate-600 leading-relaxed font-medium">--</p>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Humidity</p>
+                <p id="humidity-level" class="text-sm text-slate-600 leading-relaxed font-medium">--</p>
             </div>
         </div>
     </div>
 
     <script>
-        const NWS_API_URL = 'https://weather.gov';
+        // Open-Meteo API using exact coordinates for Sanford, FL
+        const API_URL = 'https://open-meteo.com';
 
-        document.addEventListener('DOMContentLoaded', () => {
-            getWeather();
-        });
+        // WMO Weather interpretation codes mapping
+        function getWeatherDescription(code) {
+            const descriptions = {
+                0: "Clear sky ☀️",
+                1: "Mainly clear 🌤️", 2: "Partly cloudy ⛅", 3: "Overcast ☁️",
+                45: "Foggy 🌫️", 48: "Depositing rime fog 🌫️",
+                51: "Light drizzle 🌧️", 53: "Moderate drizzle 🌧️", 55: "Dense drizzle 🌧️",
+                61: "Slight rain 🌧️", 63: "Moderate rain 🌧️", 65: "Heavy rain 🌧️",
+                71: "Slight snow ❄️", 73: "Moderate snow ❄️", 75: "Heavy snow ❄️",
+                77: "Snow grains ❄️",
+                80: "Light rain showers 🌦️", 81: "Moderate rain showers 🌦️", 82: "Violent rain showers ⛈️",
+                85: "Slight snow showers ❄️", 86: "Heavy snow showers ❄️",
+                95: "Thunderstorm 🌩️", 96: "Thunderstorm with light hail ⛈️", 99: "Thunderstorm with heavy hail ⛈️"
+            };
+            return descriptions[code] || "Variable conditions";
+        }
 
-        function updateUI(period) {
+        function updateUI(current) {
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('weather-card').classList.remove('hidden');
 
-            document.getElementById('temp').textContent = period.temperature;
-            document.getElementById('condition').textContent = period.shortForecast;
-            document.getElementById('wind').textContent = `💨 ${period.windSpeed} ${period.windDirection}`;
-            document.getElementById('detailed-forecast').textContent = period.detailedForecast;
+            document.getElementById('temp').textContent = Math.round(current.temperature_2m);
+            document.getElementById('condition').textContent = getWeatherDescription(current.weather_code);
+            document.getElementById('wind').textContent = `💨 Wind: ${Math.round(current.wind_speed_10m)} mph`;
+            document.getElementById('humidity-level').textContent = `Relative Humidity is currently at ${current.relative_humidity_2m}%.`;
         }
 
         async function getWeather() {
-            const cachedData = localStorage.getItem('sanford_weather');
+            // Instant load check via localStorage cache
+            const cachedData = localStorage.getItem('sanford_meteo_weather');
             if (cachedData) {
                 try {
                     updateUI(JSON.parse(cachedData));
                 } catch (e) {
-                    localStorage.removeItem('sanford_weather');
+                    localStorage.removeItem('sanford_meteo_weather');
                 }
             }
 
             try {
-                const response = await fetch(NWS_API_URL, {
-                    headers: {
-                        'User-Agent': 'SanfordWeatherWebsiteProject (contact: school-learning-code)'
-                    }
-                });
-                
-                if (!response.ok) throw new Error('Network response error');
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('API down');
                 
                 const data = await response.json();
-                const periods = data.properties.periods;
-                
-                if (!periods || periods.length === 0) throw new Error('No forecast periods found');
-                
-                const currentPeriod = periods[0];
+                const currentData = data.current;
 
-                localStorage.setItem('sanford_weather', JSON.stringify(currentPeriod));
-                updateUI(currentPeriod);
+                localStorage.setItem('sanford_meteo_weather', JSON.stringify(currentData));
+                updateUI(currentData);
             } catch (error) {
-                if (!localStorage.getItem('sanford_weather')) {
+                if (!localStorage.getItem('sanford_meteo_weather')) {
                     document.getElementById('loading').textContent = 'Failed to load weather data.';
                     document.getElementById('loading').classList.remove('animate-pulse');
                 }
             }
         }
+
+        document.addEventListener('DOMContentLoaded', getWeather);
     </script>
 </body>
 </html>

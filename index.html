@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanford, FL Weather</title>
+    <script src="https://jsdelivr.net"></script>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen text-slate-800 p-4">
+
+    <div class="bg-white rounded-3xl shadow-xl p-8 max-w-sm w-full text-center border border-slate-200">
+        <h1 class="text-2xl font-bold tracking-tight text-slate-900">Sanford, Florida</h1>
+        <p class="text-xs text-slate-500 uppercase tracking-widest mt-1 font-semibold">Current Conditions</p>
+
+        <div id="loading" class="my-12 text-slate-400 font-medium animate-pulse">
+            Fetching local forecast...
+        </div>
+
+        <div id="weather-card" class="hidden">
+            <div class="my-8">
+                <span id="temp" class="text-7xl font-extrabold tracking-tighter text-slate-900">--</span><span class="text-3xl font-bold text-slate-400 align-top">°F</span>
+            </div>
+            
+            <p id="condition" class="text-lg font-bold text-slate-700 capitalize leading-tight px-4">--</p>
+            <p id="wind" class="text-sm font-medium text-slate-500 mt-2 bg-slate-50 inline-block px-3 py-1 rounded-full">--</p>
+            
+            <hr class="border-slate-100 my-6">
+            
+            <div class="text-left bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Coming up</p>
+                <p id="detailed-forecast" class="text-sm text-slate-600 leading-relaxed font-medium">--</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const NWS_API_URL = 'https://weather.gov';
+
+        async function getWeather() {
+            try {
+                const response = await fetch(NWS_API_URL);
+                if (!response.ok) throw new Error('Network response error');
+                
+                const data = await response.json();
+                const currentPeriod = data.properties.periods[0];
+
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('weather-card').classList.remove('hidden');
+
+                document.getElementById('temp').textContent = currentPeriod.temperature;
+                document.getElementById('condition').textContent = currentPeriod.shortForecast;
+                document.getElementById('wind').textContent = `💨 ${currentPeriod.windSpeed} ${currentPeriod.windDirection}`;
+                document.getElementById('detailed-forecast').textContent = currentPeriod.detailedForecast;
+            } catch (error) {
+                document.getElementById('loading').textContent = 'Failed to load weather data.';
+                document.getElementById('loading').classList.remove('animate-pulse');
+            }
+        }
+
+        getWeather();
+    </script>
+</body>
+</html>

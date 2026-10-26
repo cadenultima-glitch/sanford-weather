@@ -1,302 +1,127 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanford SkyStation</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://w3.org viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
-    <style>
-        :root {
-            --bg-base: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --accent-bg: #f1f5f9;
-            --accent-glow: rgba(15, 23, 42, 0.05);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-base: #090d16;
-                --card-bg: #111827;
-                --text-main: #f8fafc;
-                --text-muted: #94a3b8;
-                --border-color: #1f2937;
-                --accent-bg: #1f2937;
-                --accent-glow: rgba(248, 250, 252, 0.03);
-            }
-        }
-
-        body {
-            background-color: var(--bg-base);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            color: var(--text-main);
-            padding: 20px;
-            box-sizing: border-box;
-            transition: background-color 0.3s ease;
-        }
-
-        .station-container {
-            background: var(--card-bg);
-            border-radius: 28px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            padding: 36px;
-            max-width: 400px;
-            width: 100%;
-            border: 1px solid var(--border-color);
-            box-sizing: border-box;
-            position: relative;
-            overflow: hidden;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        h1 {
-            font-size: 26px;
-            font-weight: 800;
-            margin: 0;
-            letter-spacing: -0.03em;
-        }
-
-        .tagline {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            margin-top: 6px;
-            font-weight: 700;
-        }
-
-        .main-display {
-            text-align: center;
-            margin: 32px 0;
-            opacity: 1;
-            transition: opacity 0.15s ease;
-        }
-
-        .temp-row {
-            display: inline-flex;
-            align-items: flex-start;
-            justify-content: center;
-        }
-
-        #temp {
-            font-size: 84px;
-            font-weight: 900;
-            line-height: 0.9;
-            letter-spacing: -0.05em;
-        }
-
-        .degree-symbol {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--text-muted);
-            margin-left: 2px;
-            margin-top: 4px;
-        }
-
-        #condition {
-            font-size: 20px;
-            font-weight: 700;
-            margin: 16px 0 0 0;
-            letter-spacing: -0.01em;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 28px;
-        }
-
-        .metric-card {
-            background: var(--accent-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 18px;
-            padding: 14px;
-            text-align: left;
-            transition: background-color 0.3s ease;
-        }
-
-        .metric-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin: 0 0 4px 0;
-        }
-
-        .metric-val {
-            font-size: 16px;
-            font-weight: 700;
-            margin: 0;
-        }
-
-        .status-bar {
-            margin-top: 28px;
-            padding-top: 16px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .sync-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 700;
-            padding: 4px 8px;
-            border-radius: 8px;
-            background: var(--accent-bg);
-            border: 1px solid var(--border-color);
-            transition: all 0.2s ease;
-        }
-
-        .sync-btn:hover {
-            color: var(--text-main);
-            transform: scale(1.03);
-        }
-
-        .sync-btn:active {
-            transform: scale(0.97);
-        }
-
-        #state-indicator {
-            font-weight: 600;
-        }
-
-        .pulse {
-            animation: pulse-anim 1.5s infinite;
-        }
-
-        @keyframes pulse-anim {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanford SkyStation</title>
+<style>
+  :root {
+    --sky-top: #3a7bd5;
+    --sky-bottom: #9fd3f5;
+    --ink: #0f2233;
+    --card: rgba(255, 255, 255, 0.22);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Georgia, "Times New Roman", serif;
+    color: #fff;
+    background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom));
+    transition: background 0.8s;
+    padding: 24px;
+  }
+  main { width: 100%; max-width: 420px; text-align: center; }
+  h1 { font-size: 1.6rem; margin: 0; font-weight: 400; }
+  .sub { margin: 4px 0 28px; opacity: 0.85; font-style: italic; }
+  .temp { font-size: 6rem; line-height: 1; margin: 0; font-weight: 400; }
+  .desc { margin: 8px 0 28px; font-size: 1.1rem; min-height: 1.4em; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card { background: var(--card); border-radius: 14px; padding: 16px; }
+  .card .label { font-size: 0.85rem; opacity: 0.85; }
+  .card .val { font-size: 1.6rem; margin-top: 6px; }
+  .status { margin: 24px 0 12px; font-size: 0.9rem; opacity: 0.9; }
+  button {
+    font: inherit; color: var(--ink); background: #fff; border: 0;
+    border-radius: 999px; padding: 10px 26px; cursor: pointer;
+  }
+  button:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  button:disabled { opacity: 0.6; cursor: wait; }
+</style>
 </head>
 <body>
+<main>
+  <h1>Sanford, Florida</h1>
+  <p class="sub">Micro-Weather Station</p>
 
-    <div class="station-container">
-        <div class="header">
-            <h1>Sanford, Florida</h1>
-            <div class="tagline">Micro-Weather Station</div>
-        </div>
+  <p class="temp" id="temp">--°F</p>
+  <p class="desc" id="desc">Syncing server...</p>
 
-        <div id="display-block" class="main-display">
-            <div class="temp-row">
-                <span id="temp">--</span>
-                <span class="degree-symbol">°F</span>
-            </div>
-            <p id="condition">Syncing Server...</p>
-        </div>
+  <div class="grid">
+    <div class="card"><div class="label">💨 Wind speed</div><div class="val" id="wind">--</div></div>
+    <div class="card"><div class="label">💧 Humidity</div><div class="val" id="humidity">--</div></div>
+  </div>
 
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <p class="metric-label">💨 Wind Speed</p>
-                <p id="wind" class="metric-val">--</p>
-            </div>
-            <div class="metric-card">
-                <p class="metric-label">💧 Humidity</p>
-                <p id="humidity" class="metric-val">--</p>
-            </div>
-        </div>
+  <p class="status" id="status">Status: Initializing</p>
+  <button id="refresh" type="button">Update</button>
+</main>
 
-        <div class="status-bar">
-            <div>Status: <span id="state-indicator" class="pulse">Initializing</span></div>
-            <button class="sync-btn" id="refresh-trigger" onclick="forceRefresh()">Update</button>
-        </div>
-    </div>
+<script>
+  // Orlando Sanford International Airport (KSFB) is the closest official station.
+  // KMCO (Orlando International) is the backup if KSFB has no data.
+  var STATIONS = ["KSFB", "KMCO"];
 
-    <script>
-        const PRIMARY_URL = 'https://open-meteo.com';
-        const BACKUP_URL = 'https://open-meteo.com';
+  function $(id) { return document.getElementById(id); }
 
-        const wmoCodes = {
-            0: "Clear Sky ☀️", 1: "Mainly Clear 🌤️", 2: "Partly Cloudy ⛅", 3: "Overcast ☁️",
-            45: "Fog conditions 🌫️", 48: "Rime Fog 🌫️", 51: "Light Drizzle 🌧️", 53: "Drizzle 🌧️",
-            55: "Dense Drizzle 🌧️", 61: "Slight Rain 🌧️", 63: "Rain 🌧️", 65: "Heavy Rain 🌧️",
-            71: "Slight Snow ❄️", 73: "Snow ❄️", 75: "Heavy Snow ❄️", 80: "Rain Showers 🌦️",
-            81: "Showers 🌦️", 82: "Heavy Showers ⛈️", 95: "Thunderstorm 🌩️", 96: "Thunderstorm ⛈️", 99: "Heavy Storm ⛈️"
-        };
+  function setSky(text, isDay) {
+    var root = document.documentElement.style;
+    var stormy = /rain|storm|thunder|drizzle|shower|fog/i.test(text || "");
+    if (!isDay) { root.setProperty("--sky-top", "#0b1630"); root.setProperty("--sky-bottom", "#2c3e6b"); }
+    else if (stormy) { root.setProperty("--sky-top", "#4a5568"); root.setProperty("--sky-bottom", "#8795a8"); }
+    else { root.setProperty("--sky-top", "#3a7bd5"); root.setProperty("--sky-bottom", "#9fd3f5"); }
+  }
 
-        function render(data) {
-            const indicator = document.getElementById('state-indicator');
-            indicator.textContent = "Live";
-            indicator.className = "";
-            indicator.style.color = "#22c55e";
+  async function getObservation(station) {
+    var res = await fetch("https://api.weather.gov/stations/" + station + "/observations/latest");
+    if (!res.ok) throw new Error(station + " returned " + res.status);
+    var data = await res.json();
+    var p = data.properties;
+    if (p.temperature.value === null) throw new Error(station + " has no temperature right now");
+    return { station: station, p: p };
+  }
 
-            document.getElementById('temp').textContent = Math.round(data.temperature_2m);
-            document.getElementById('condition').textContent = wmoCodes[data.weather_code] || "Clear Conditions 🌤️";
-            document.getElementById('wind').textContent = `${Math.round(data.wind_speed_10m)} mph`;
-            document.getElementById('humidity').textContent = `${data.relative_humidity_2m}%`;
-        }
+  async function loadWeather() {
+    var btn = $("refresh");
+    btn.disabled = true;
+    $("status").textContent = "Status: Updating...";
+    try {
+      var obs = null, lastErr = null;
+      for (var i = 0; i < STATIONS.length && !obs; i++) {
+        try { obs = await getObservation(STATIONS[i]); }
+        catch (e) { lastErr = e; }
+      }
+      if (!obs) throw lastErr || new Error("No station data");
 
-        async function fetchPayload() {
-            const indicator = document.getElementById('state-indicator');
-            indicator.textContent = "Updating";
-            indicator.className = "pulse";
-            indicator.style.color = "var(--text-muted)";
+      var p = obs.p;
+      var tempF = p.temperature.value * 9 / 5 + 32;           // NWS gives Celsius
+      var windMph = p.windSpeed.value === null ? null : p.windSpeed.value * 0.621371; // km/h -> mph
+      var hum = p.relativeHumidity.value;
+      var isDay = !/\/night\//.test(p.icon || "");
 
-            try {
-                let res = await fetch(PRIMARY_URL);
-                if (!res.ok) throw new Error();
-                let pack = await res.json();
-                processSuccess(pack.current);
-            } catch (e) {
-                try {
-                    let backupRes = await fetch(BACKUP_URL);
-                    if (!backupRes.ok) throw new Error();
-                    let backupPack = await backupRes.json();
-                    processSuccess(backupPack.current);
-                } catch (err) {
-                    if (!localStorage.getItem('sanford_station_data')) {
-                        document.getElementById('condition').textContent = "Offline Mode";
-                        indicator.textContent = "Error";
-                        indicator.style.color = "#ef4444";
-                    }
-                }
-            }
-        }
+      $("temp").textContent = Math.round(tempF) + "°F";
+      $("desc").textContent = p.textDescription || "Conditions unavailable";
+      $("wind").textContent = windMph === null ? "Calm" : Math.round(windMph) + " mph";
+      $("humidity").textContent = hum === null ? "--" : Math.round(hum) + "%";
+      setSky(p.textDescription, isDay);
 
-        function processSuccess(current) {
-            localStorage.setItem('sanford_station_data', JSON.stringify(current));
-            render(current);
-        }
+      $("status").textContent = "Status: Live from " + obs.station + ", " +
+        new Date(p.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    } catch (err) {
+      $("desc").textContent = "Couldn't load weather";
+      $("status").textContent = "Status: Error, " + err.message;
+      console.error(err);
+    } finally {
+      btn.disabled = false;
+    }
+  }
 
-        function forceRefresh() {
-            fetchPayload();
-        }
-
-        function bootSequence() {
-            const structuralCache = localStorage.getItem('sanford_station_data');
-            if (structuralCache) {
-                render(JSON.parse(structuralCache));
-            }
-            fetchPayload();
-        }
-
-        bootSequence();
-    </script>
+  $("refresh").addEventListener("click", loadWeather);
+  loadWeather();
+</script>
 </body>
 </html>
-
 

@@ -38,7 +38,12 @@
 
         async function getWeather() {
             try {
-                const response = await fetch(NWS_API_URL);
+                const response = await fetch(NWS_API_URL, {
+                    headers: {
+                        'User-Agent': 'SanfordWeatherAppProject (contact: student-learning-code)'
+                    }
+                });
+                
                 if (!response.ok) throw new Error('Network response error');
                 
                 const data = await response.json();

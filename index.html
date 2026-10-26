@@ -54,7 +54,11 @@
         async function getWeather() {
             const cachedData = localStorage.getItem('sanford_weather');
             if (cachedData) {
-                updateUI(JSON.parse(cachedData));
+                try {
+                    updateUI(JSON.parse(cachedData));
+                } catch (e) {
+                    localStorage.removeItem('sanford_weather');
+                }
             }
 
             try {
@@ -67,7 +71,11 @@
                 if (!response.ok) throw new Error('Network response error');
                 
                 const data = await response.json();
-                const currentPeriod = data.properties.periods[0];
+                const periods = data.properties.periods;
+                
+                if (!periods || periods.length === 0) throw new Error('No forecast periods found');
+                
+                const currentPeriod = periods[0];
 
                 localStorage.setItem('sanford_weather', JSON.stringify(currentPeriod));
                 updateUI(currentPeriod);

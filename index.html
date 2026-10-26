@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sanford, FL Weather</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <script src="https://jsdelivr.net"></script>
 </head>
 <body class="bg-slate-100 flex items-center justify-center min-h-screen text-slate-800 p-4">
@@ -55,7 +56,7 @@
             try {
                 const response = await fetch(NWS_API_URL, {
                     headers: {
-                        'User-Agent': 'SanfordWeatherAppProject (contact: student-learning-code)'
+                        'User-Agent': 'SanfordWeatherWebsiteProject (contact: school-learning-code)'
                     }
                 });
                 
@@ -65,7 +66,6 @@
                 const currentPeriod = data.properties.periods[0];
 
                 localStorage.setItem('sanford_weather', JSON.stringify(currentPeriod));
-                
                 updateUI(currentPeriod);
             } catch (error) {
                 if (!localStorage.getItem('sanford_weather')) {
@@ -79,3 +79,4 @@
     </script>
 </body>
 </html>
+

@@ -3,99 +3,300 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanford, FL Weather</title>
-    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-    <!-- Tailwind v3 script for reliable, runtime browser compilation -->
-    <script src="https://tailwindcss.com"></script>
+    <title>Sanford SkyStation</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://w3.org viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+    <style>
+        :root {
+            --bg-base: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent-bg: #f1f5f9;
+            --accent-glow: rgba(15, 23, 42, 0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-base: #090d16;
+                --card-bg: #111827;
+                --text-main: #f8fafc;
+                --text-muted: #94a3b8;
+                --border-color: #1f2937;
+                --accent-bg: #1f2937;
+                --accent-glow: rgba(248, 250, 252, 0.03);
+            }
+        }
+
+        body {
+            background-color: var(--bg-base);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text-main);
+            padding: 20px;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease;
+        }
+
+        .station-container {
+            background: var(--card-bg);
+            border-radius: 28px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 36px;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.03em;
+        }
+
+        .tagline {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-top: 6px;
+            font-weight: 700;
+        }
+
+        .main-display {
+            text-align: center;
+            margin: 32px 0;
+            opacity: 1;
+            transition: opacity 0.15s ease;
+        }
+
+        .temp-row {
+            display: inline-flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        #temp {
+            font-size: 84px;
+            font-weight: 900;
+            line-height: 0.9;
+            letter-spacing: -0.05em;
+        }
+
+        .degree-symbol {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-left: 2px;
+            margin-top: 4px;
+        }
+
+        #condition {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 16px 0 0 0;
+            letter-spacing: -0.01em;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .metric-card {
+            background: var(--accent-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 14px;
+            text-align: left;
+            transition: background-color 0.3s ease;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 0 0 4px 0;
+        }
+
+        .metric-val {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .status-bar {
+            margin-top: 28px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .sync-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 8px;
+            background: var(--accent-bg);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .sync-btn:hover {
+            color: var(--text-main);
+            transform: scale(1.03);
+        }
+
+        .sync-btn:active {
+            transform: scale(0.97);
+        }
+
+        #state-indicator {
+            font-weight: 600;
+        }
+
+        .pulse {
+            animation: pulse-anim 1.5s infinite;
+        }
+
+        @keyframes pulse-anim {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+    </style>
 </head>
-<body class="bg-slate-100 flex items-center justify-center min-h-screen text-slate-800 p-4">
+<body>
 
-    <div class="bg-white rounded-3xl shadow-xl p-8 max-w-sm w-full text-center border border-slate-200">
-        <h1 class="text-2xl font-bold tracking-tight text-slate-900">Sanford, Florida</h1>
-        <p class="text-xs text-slate-500 uppercase tracking-widest mt-1 font-semibold">Current Conditions</p>
-
-        <div id="loading" class="my-12 text-slate-400 font-medium animate-pulse">
-            Fetching local forecast...
+    <div class="station-container">
+        <div class="header">
+            <h1>Sanford, Florida</h1>
+            <div class="tagline">Micro-Weather Station</div>
         </div>
 
-        <div id="weather-card" class="hidden">
-            <div class="my-8">
-                <span id="temp" class="text-7xl font-extrabold tracking-tighter text-slate-900">--</span><span class="text-3xl font-bold text-slate-400 align-top">°F</span>
+        <div id="display-block" class="main-display">
+            <div class="temp-row">
+                <span id="temp">--</span>
+                <span class="degree-symbol">°F</span>
             </div>
-            
-            <p id="condition" class="text-lg font-bold text-slate-700 capitalize leading-tight px-4">--</p>
-            <p id="wind" class="text-sm font-medium text-slate-500 mt-2 bg-slate-50 inline-block px-3 py-1 rounded-full">--</p>
-            
-            <hr class="border-slate-100 my-6">
-            
-            <div class="text-left bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Humidity</p>
-                <p id="humidity-level" class="text-sm text-slate-600 leading-relaxed font-medium">--</p>
+            <p id="condition">Syncing Server...</p>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <p class="metric-label">💨 Wind Speed</p>
+                <p id="wind" class="metric-val">--</p>
             </div>
+            <div class="metric-card">
+                <p class="metric-label">💧 Humidity</p>
+                <p id="humidity" class="metric-val">--</p>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div>Status: <span id="state-indicator" class="pulse">Initializing</span></div>
+            <button class="sync-btn" id="refresh-trigger" onclick="forceRefresh()">Update</button>
         </div>
     </div>
 
     <script>
-        // Open-Meteo API using exact coordinates for Sanford, FL
-        const API_URL = 'https://open-meteo.com';
+        const PRIMARY_URL = 'https://open-meteo.com';
+        const BACKUP_URL = 'https://open-meteo.com';
 
-        // WMO Weather interpretation codes mapping
-        function getWeatherDescription(code) {
-            const descriptions = {
-                0: "Clear sky ☀️",
-                1: "Mainly clear 🌤️", 2: "Partly cloudy ⛅", 3: "Overcast ☁️",
-                45: "Foggy 🌫️", 48: "Depositing rime fog 🌫️",
-                51: "Light drizzle 🌧️", 53: "Moderate drizzle 🌧️", 55: "Dense drizzle 🌧️",
-                61: "Slight rain 🌧️", 63: "Moderate rain 🌧️", 65: "Heavy rain 🌧️",
-                71: "Slight snow ❄️", 73: "Moderate snow ❄️", 75: "Heavy snow ❄️",
-                77: "Snow grains ❄️",
-                80: "Light rain showers 🌦️", 81: "Moderate rain showers 🌦️", 82: "Violent rain showers ⛈️",
-                85: "Slight snow showers ❄️", 86: "Heavy snow showers ❄️",
-                95: "Thunderstorm 🌩️", 96: "Thunderstorm with light hail ⛈️", 99: "Thunderstorm with heavy hail ⛈️"
-            };
-            return descriptions[code] || "Variable conditions";
+        const wmoCodes = {
+            0: "Clear Sky ☀️", 1: "Mainly Clear 🌤️", 2: "Partly Cloudy ⛅", 3: "Overcast ☁️",
+            45: "Fog conditions 🌫️", 48: "Rime Fog 🌫️", 51: "Light Drizzle 🌧️", 53: "Drizzle 🌧️",
+            55: "Dense Drizzle 🌧️", 61: "Slight Rain 🌧️", 63: "Rain 🌧️", 65: "Heavy Rain 🌧️",
+            71: "Slight Snow ❄️", 73: "Snow ❄️", 75: "Heavy Snow ❄️", 80: "Rain Showers 🌦️",
+            81: "Showers 🌦️", 82: "Heavy Showers ⛈️", 95: "Thunderstorm 🌩️", 96: "Thunderstorm ⛈️", 99: "Heavy Storm ⛈️"
+        };
+
+        function render(data) {
+            const indicator = document.getElementById('state-indicator');
+            indicator.textContent = "Live";
+            indicator.className = "";
+            indicator.style.color = "#22c55e";
+
+            document.getElementById('temp').textContent = Math.round(data.temperature_2m);
+            document.getElementById('condition').textContent = wmoCodes[data.weather_code] || "Clear Conditions 🌤️";
+            document.getElementById('wind').textContent = `${Math.round(data.wind_speed_10m)} mph`;
+            document.getElementById('humidity').textContent = `${data.relative_humidity_2m}%`;
         }
 
-        function updateUI(current) {
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('weather-card').classList.remove('hidden');
-
-            document.getElementById('temp').textContent = Math.round(current.temperature_2m);
-            document.getElementById('condition').textContent = getWeatherDescription(current.weather_code);
-            document.getElementById('wind').textContent = `💨 Wind: ${Math.round(current.wind_speed_10m)} mph`;
-            document.getElementById('humidity-level').textContent = `Relative Humidity is currently at ${current.relative_humidity_2m}%.`;
-        }
-
-        async function getWeather() {
-            // Instant load check via localStorage cache
-            const cachedData = localStorage.getItem('sanford_meteo_weather');
-            if (cachedData) {
-                try {
-                    updateUI(JSON.parse(cachedData));
-                } catch (e) {
-                    localStorage.removeItem('sanford_meteo_weather');
-                }
-            }
+        async function fetchPayload() {
+            const indicator = document.getElementById('state-indicator');
+            indicator.textContent = "Updating";
+            indicator.className = "pulse";
+            indicator.style.color = "var(--text-muted)";
 
             try {
-                const response = await fetch(API_URL);
-                if (!response.ok) throw new Error('API down');
-                
-                const data = await response.json();
-                const currentData = data.current;
-
-                localStorage.setItem('sanford_meteo_weather', JSON.stringify(currentData));
-                updateUI(currentData);
-            } catch (error) {
-                if (!localStorage.getItem('sanford_meteo_weather')) {
-                    document.getElementById('loading').textContent = 'Failed to load weather data.';
-                    document.getElementById('loading').classList.remove('animate-pulse');
+                let res = await fetch(PRIMARY_URL);
+                if (!res.ok) throw new Error();
+                let pack = await res.json();
+                processSuccess(pack.current);
+            } catch (e) {
+                try {
+                    let backupRes = await fetch(BACKUP_URL);
+                    if (!backupRes.ok) throw new Error();
+                    let backupPack = await backupRes.json();
+                    processSuccess(backupPack.current);
+                } catch (err) {
+                    if (!localStorage.getItem('sanford_station_data')) {
+                        document.getElementById('condition').textContent = "Offline Mode";
+                        indicator.textContent = "Error";
+                        indicator.style.color = "#ef4444";
+                    }
                 }
             }
         }
 
-        document.addEventListener('DOMContentLoaded', getWeather);
+        function processSuccess(current) {
+            localStorage.setItem('sanford_station_data', JSON.stringify(current));
+            render(current);
+        }
+
+        function forceRefresh() {
+            fetchPayload();
+        }
+
+        function bootSequence() {
+            const structuralCache = localStorage.getItem('sanford_station_data');
+            if (structuralCache) {
+                render(JSON.parse(structuralCache));
+            }
+            fetchPayload();
+        }
+
+        bootSequence();
     </script>
 </body>
 </html>
+
 

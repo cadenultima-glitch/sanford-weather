@@ -669,7 +669,39 @@ $("status").textContent="Live from "+obs.station;    if (/night/i.test(p.icon ||
 $("refresh").addEventListener("click",loadWeather);
 
 loadWeather();
+async function loadForecast(){
+  try{
+    const pointRes = await fetch("https://api.weather.gov/points/28.8003,-81.2731");
+    const pointData = await pointRes.json();
+    const forecastUrl = pointData.properties.forecast;
 
+    const forecastRes = await fetch(forecastUrl);
+    const forecastData = await forecastRes.json();
+
+    const periods = forecastData.properties.periods.slice(0,5);
+
+    $("forecast").innerHTML = periods.map(function(p){
+      const icon = weatherIcon(p.shortForecast);
+      return `
+        <div class="fday">
+          <div class="fleft">
+            <div class="ficon">${icon}</div>
+            <div>
+              <div class="fname">${p.name}</div>
+              <div class="fdesc">${p.shortForecast}</div>
+            </div>
+          </div>
+          <div class="fhi">${Math.round(p.temperature)}°${forecastData.properties.periods[0].temperatureUnit}</div>
+        </div>
+      `;
+    }).join("");
+  }catch(err){
+    $("forecast").textContent = "Forecast unavailable";
+    console.error(err);
+  }
+}
+
+loadForecast();
 </script>
 setInterval(() => {
   const hour = new Date().getHours();

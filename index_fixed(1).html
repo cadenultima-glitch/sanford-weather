@@ -198,7 +198,77 @@ to{
 transform:translateX(calc(100vw + 700px));
 }
 }
+```css
+#forecast{
 
+display:grid;
+
+gap:12px;
+
+}
+
+.day{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:14px 18px;
+
+background:rgba(255,255,255,.08);
+
+border-radius:18px;
+
+}
+
+.left{
+
+display:flex;
+
+align-items:center;
+
+gap:14px;
+
+}
+
+.dayIcon{
+
+font-size:28px;
+
+}
+
+.dayName{
+
+font-weight:600;
+
+}
+
+.dayDesc{
+
+font-size:.82rem;
+
+opacity:.8;
+
+}
+
+.high{
+
+font-weight:bold;
+
+font-size:1.2rem;
+
+}
+
+.low{
+
+opacity:.7;
+
+margin-left:8px;
+
+}
+```
 @media(max-width:650px){
 
 .hero{
@@ -304,7 +374,21 @@ Loading...
 </div>
 
 </div>
+```html
+<div class="glass">
 
+<h2 style="margin-bottom:18px;">
+5-Day Forecast
+</h2>
+
+<div id="forecast">
+
+Loading forecast...
+
+</div>
+
+</div>
+```
 <script>
 
 ```javascript
@@ -407,7 +491,101 @@ loadWeather();
 
 setInterval(loadWeather,300000);
 ```
+```javascript
+async function loadForecast(){
 
+try{
+
+const point=await fetch(
+"https://api.weather.gov/points/28.8003,-81.2731"
+);
+
+const pointData=await point.json();
+
+const res=await fetch(
+pointData.properties.forecast
+);
+
+const data=await res.json();
+
+const periods=data.properties.periods;
+
+let html="";
+
+for(let i=0;i<10;i+=2){
+
+const day=periods[i];
+
+const night=periods[i+1];
+
+html+=`
+
+<div class="day">
+
+<div class="left">
+
+<div class="dayIcon">
+
+${weatherIcon(day.shortForecast,true)}
+
+</div>
+
+<div>
+
+<div class="dayName">
+
+${day.name}
+
+</div>
+
+<div class="dayDesc">
+
+${day.shortForecast}
+
+</div>
+
+</div>
+
+</div>
+
+<div>
+
+<span class="high">
+
+${day.temperature}°
+
+</span>
+
+<span class="low">
+
+${night?night.temperature:"--"}°
+
+</span>
+
+</div>
+
+</div>
+
+`;
+
+}
+
+$("forecast").innerHTML=html;
+
+}
+
+catch(e){
+
+$("forecast").innerHTML="Couldn't load forecast.";
+
+console.error(e);
+
+}
+
+}
+
+loadForecast();
+```
 </script>
 
 </body>

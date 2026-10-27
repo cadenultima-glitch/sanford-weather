@@ -1,1 +1,127 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanford SkyStation</title>
+<style>
+  :root {
+    --sky-top: #3a7bd5;
+    --sky-bottom: #9fd3f5;
+    --ink: #0f2233;
+    --card: rgba(255, 255, 255, 0.22);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Georgia, "Times New Roman", serif;
+    color: #fff;
+    background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom));
+    transition: background 0.8s;
+    padding: 24px;
+  }
+  main { width: 100%; max-width: 420px; text-align: center; }
+  h1 { font-size: 1.6rem; margin: 0; font-weight: 400; }
+  .sub { margin: 4px 0 28px; opacity: 0.85; font-style: italic; }
+  .temp { font-size: 6rem; line-height: 1; margin: 0; font-weight: 400; }
+  .desc { margin: 8px 0 28px; font-size: 1.1rem; min-height: 1.4em; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card { background: var(--card); border-radius: 14px; padding: 16px; }
+  .card .label { font-size: 0.85rem; opacity: 0.85; }
+  .card .val { font-size: 1.6rem; margin-top: 6px; }
+  .status { margin: 24px 0 12px; font-size: 0.9rem; opacity: 0.9; }
+  button {
+    font: inherit; color: var(--ink); background: #fff; border: 0;
+    border-radius: 999px; padding: 10px 26px; cursor: pointer;
+  }
+  button:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  button:disabled { opacity: 0.6; cursor: wait; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Sanford, Florida</h1>
+  <p class="sub">Micro-Weather Station</p>
+
+  <p class="temp" id="temp">--°F</p>
+  <p class="desc" id="desc">Syncing server...</p>
+
+  <div class="grid">
+    <div class="card"><div class="label">💨 Wind speed</div><div class="val" id="wind">--</div></div>
+    <div class="card"><div class="label">💧 Humidity</div><div class="val" id="humidity">--</div></div>
+  </div>
+
+  <p class="status" id="status">Status: Initializing</p>
+  <button id="refresh" type="button">Update</button>
+</main>
+
+<script>
+  // Orlando Sanford International Airport (KSFB) is the closest official station.
+  // KMCO (Orlando International) is the backup if KSFB has no data.
+  var STATIONS = ["KSFB", "KMCO"];
+
+  function $(id) { return document.getElementById(id); }
+
+  function setSky(text, isDay) {
+    var root = document.documentElement.style;
+    var stormy = /rain|storm|thunder|drizzle|shower|fog/i.test(text || "");
+    if (!isDay) { root.setProperty("--sky-top", "#0b1630"); root.setProperty("--sky-bottom", "#2c3e6b"); }
+    else if (stormy) { root.setProperty("--sky-top", "#4a5568"); root.setProperty("--sky-bottom", "#8795a8"); }
+    else { root.setProperty("--sky-top", "#3a7bd5"); root.setProperty("--sky-bottom", "#9fd3f5"); }
+  }
+
+  async function getObservation(station) {
+    var res = await fetch("https://api.weather.gov/stations/" + station + "/observations/latest");
+    if (!res.ok) throw new Error(station + " returned " + res.status);
+    var data = await res.json();
+    var p = data.properties;
+    if (p.temperature.value === null) throw new Error(station + " has no temperature right now");
+    return { station: station, p: p };
+  }
+
+  async function loadWeather() {
+    var btn = $("refresh");
+    btn.disabled = true;
+    $("status").textContent = "Status: Updating...";
+    try {
+      var obs = null, lastErr = null;
+      for (var i = 0; i < STATIONS.length && !obs; i++) {
+        try { obs = await getObservation(STATIONS[i]); }
+        catch (e) { lastErr = e; }
+      }
+      if (!obs) throw lastErr || new Error("No station data");
+
+      var p = obs.p;
+      var tempF = p.temperature.value * 9 / 5 + 32;           // NWS gives Celsius
+      var windMph = p.windSpeed.value === null ? null : p.windSpeed.value * 0.621371; // km/h -> mph
+      var hum = p.relativeHumidity.value;
+      var isDay = !/\/night\//.test(p.icon || "");
+
+      $("temp").textContent = Math.round(tempF) + "°F";
+      $("desc").textContent = p.textDescription || "Conditions unavailable";
+      $("wind").textContent = windMph === null ? "Calm" : Math.round(windMph) + " mph";
+      $("humidity").textContent = hum === null ? "--" : Math.round(hum) + "%";
+      setSky(p.textDescription, isDay);
+
+      $("status").textContent = "Status: Live from " + obs.station + ", " +
+        new Date(p.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    } catch (err) {
+      $("desc").textContent = "Couldn't load weather";
+      $("status").textContent = "Status: Error, " + err.message;
+      console.error(err);
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  $("refresh").addEventListener("click", loadWeather);
+  loadWeather();
+</script>
+</body>
+</html>
+

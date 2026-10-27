@@ -371,6 +371,22 @@ body.night .stars {
 @keyframes twinkle {
   from { opacity: 0.45; }
   to { opacity: 1; }
+}.alerts{
+  margin-top:18px;
+  background:rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:18px;
+  padding:14px 16px;
+  backdrop-filter:blur(14px);
+  text-align:left;
+}
+
+.alertItem{
+  margin-bottom:12px;
+}
+
+.alertItem:last-child{
+  margin-bottom:0;
 }
 </style>
 .forecast{
@@ -470,7 +486,9 @@ Feels like --°F
 </div>
 <div class="forecast" id="forecast">Loading forecast...</div>
 <div class="value" id="wind">
-
+<div class="alerts" id="alerts">
+  No alerts right now.
+</div>
 --
 
 </div>
